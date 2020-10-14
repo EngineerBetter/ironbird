@@ -11,7 +11,7 @@ cases:
         - { bash: "stat modified", exits: 1, says: ["modified: stat: No such file or directory"]}
     has_inputs:
     - name: input
-      from: fixtures/existing_file
+      from: inputs/existing_file
   params: &params
     CONTENTS: mycontents
     FILENAME: myfile
@@ -24,7 +24,7 @@ cases:
           - { bash: "stat modified", exits: 0 }
     has_inputs:
       - name: input
-        from: fixtures/existing_file
+        from: inputs/existing_file
         setup: |
           echo foo > modified
   params: &params
