@@ -2,17 +2,20 @@ package ironbird_test
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"time"
+
+	. "github.com/EngineerBetter/ironbird"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	. "github.com/EngineerBetter/ironbird"
-	"io/ioutil"
-	"os"
-	"time"
 )
 
 var _ = Describe("", func() {
+	defer GinkgoRecover()
+
 	for _, specX := range specs {
 		// Re-assign as otherwise the single pointer is shared by the anonymous functions, and by the time that they
 		// execute, range will have made the single pointer point to something else. Possibly.
@@ -29,11 +32,11 @@ var _ = Describe("", func() {
 						expectErrToNotHaveOccurred(err)
 
 						if input.From != "" {
-							MustBash("cp -r " + input.From + "/. " + inputPath)
+							MustBash("cp -r "+input.From+"/. "+inputPath, spec.SpecDir)
 						}
 
 						if input.Setup != "" {
-							MustBashIn(inputPath, input.Setup)
+							MustBash(input.Setup, inputPath)
 						}
 
 						inputDirs[input.Name] = inputPath
@@ -55,7 +58,7 @@ var _ = Describe("", func() {
 						timeout, err := time.ParseDuration(within)
 						Expect(err).ToNot(HaveOccurred())
 						timeout = timeout * time.Duration(timeoutFactorArg)
-						session = FlyExecute(targetArg, spec.Config, specCase.Params, inputDirs, outputDirs, timeout)
+						session = FlyExecute(targetArg, spec.SpecDir, spec.Config, specCase.Params, inputDirs, outputDirs, timeout)
 						Expect(session).To(Exit(specCase.It.Exits), OutErrMessage(session))
 						Expect(session).To(Say("executing build"))
 						Expect(session).To(Say("initializing"))
@@ -64,7 +67,7 @@ var _ = Describe("", func() {
 					for _, sayExpectationX := range specCase.It.Says {
 						sayExpectation := sayExpectationX
 
-						It("says "+sayExpectation, func(){
+						It("says "+sayExpectation, func() {
 							Expect(session).To(Say(sayExpectation))
 						})
 					}
@@ -72,21 +75,21 @@ var _ = Describe("", func() {
 					for _, outputExpectationX := range specCase.It.HasOutputs {
 						outputExpectation := outputExpectationX
 
-						Describe(fmt.Sprintf(", it has an output '%s'", outputExpectation.Name), func(){
+						Describe(fmt.Sprintf(", it has an output '%s'", outputExpectation.Name), func() {
 							for _, forWhichX := range outputExpectation.ForWhich {
 								forWhich := forWhichX
 
-								Describe(fmt.Sprintf("for which '%s'", forWhich.Bash), func(){
+								Describe(fmt.Sprintf("for which '%s'", forWhich.Bash), func() {
 									var assertionSession *Session
-									It(fmt.Sprintf("exits %d", forWhich.Exits), func(){
+									It(fmt.Sprintf("exits %d", forWhich.Exits), func() {
 										// THE REDIRECT IS ABSOLUTE CHEDDAR
-										assertionSession = BashIn(outputDirs[outputExpectation.Name], forWhich.Bash+" 2>&1")
+										assertionSession = Bash(forWhich.Bash+" 2>&1", outputDirs[outputExpectation.Name])
 										Expect(assertionSession).To(Exit(forWhich.Exits), OutErrMessage(assertionSession))
 									})
 
 									for _, sayExpectationX := range forWhich.Says {
 										sayExpectation := sayExpectationX
-										It("says "+sayExpectation, func(){
+										It("says "+sayExpectation, func() {
 											Expect(assertionSession).To(Say(sayExpectation))
 										})
 									}
@@ -106,4 +109,3 @@ func expectErrToNotHaveOccurred(err error) {
 		os.Exit(1)
 	}
 }
-

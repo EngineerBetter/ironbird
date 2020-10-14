@@ -2,20 +2,23 @@ package ironbird
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"time"
+
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
-	"os"
-	"os/exec"
-	"time"
 )
 
 type TaskTestSuite struct {
-	Config string `yaml:"config"`
-	Cases  []struct {
-		When string `yaml:"when"`
+	SpecDir string
+	Config  string `yaml:"config"`
+	Cases   []struct {
+		When   string `yaml:"when"`
 		Within string `yaml:"within"`
-		It   struct {
+		It     struct {
 			Exits      int      `yaml:"exits"`
 			Says       []string `yaml:"says"`
 			HasOutputs []struct {
@@ -36,11 +39,10 @@ type TaskTestSuite struct {
 	} `yaml:"cases"`
 }
 
-func FlyExecute(target, configPath string, params map[string]string, inputDirs, outputDirs map[string]string, timeout time.Duration) *gexec.Session {
-	pwd, err := os.Getwd()
-	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+func FlyExecute(target, specDir, configPath string, params map[string]string, inputDirs, outputDirs map[string]string, timeout time.Duration) *gexec.Session {
+	gomega.Expect(specDir).To(gomega.BeADirectory())
 
-	flyArgs := []string{"-t", target, "execute", "-c", configPath, "--include-ignored", "--input=this=" + pwd}
+	flyArgs := []string{"-t", target, "execute", "-c", configPath, "--include-ignored", "--input=this=" + specDir}
 
 	for name, dir := range inputDirs {
 		flyArgs = append(flyArgs, "--input="+name+"="+dir)
@@ -51,6 +53,7 @@ func FlyExecute(target, configPath string, params map[string]string, inputDirs, 
 	}
 
 	cmd := exec.Command("fly", flyArgs...)
+	cmd.Dir = specDir
 	cmd.Env = os.Environ()
 	for key, value := range params {
 		setEnv(key, value, cmd)
@@ -70,24 +73,19 @@ func setEnv(key, value string, cmd *exec.Cmd) {
 	cmd.Env = append(cmd.Env, key+"="+value)
 }
 
-func BashIn(dir, command string) *gexec.Session {
-	return Bash("cd " + dir + " && " + command)
-}
-
-func Bash(command string) *gexec.Session {
+func Bash(command, dir string) *gexec.Session {
 	cmd := exec.Command("bash", "-x", "-e", "-u", "-c", command)
+	cmd.Dir = dir
 	session, err := gexec.Start(cmd, ginkgo.GinkgoWriter, ginkgo.GinkgoWriter)
-	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(err).NotTo(gomega.HaveOccurred(), fmt.Sprintf("command: %s\ndir: %s\n", command, dir))
 	gomega.Eventually(session, 20*time.Second).Should(gexec.Exit())
 	return session
 }
 
-func MustBashIn(dir, command string) *gexec.Session {
-	return MustBash("cd " + dir + "; " + command)
-}
-
-func MustBash(command string) *gexec.Session {
-	session := Bash(command)
-	gomega.Expect(session.ExitCode()).To(gomega.BeZero(), "bash command: %v\nSTDOUT:\n%v\nSTDERR:\n%v", command, string(session.Out.Contents()), string(session.Err.Contents()))
+func MustBash(command, dir string) *gexec.Session {
+	session := Bash(command, dir)
+	absWorkingDir, err := filepath.Abs(session.Command.Dir)
+	gomega.Expect(err).ToNot(gomega.HaveOccurred())
+	gomega.Expect(session.ExitCode()).To(gomega.BeZero(), "Bash command:\n%v\nWorking dir:\n%s\nSTDOUT:\n%v\nSTDERR:\n%v", command, absWorkingDir, string(session.Out.Contents()), string(session.Err.Contents()))
 	return session
 }

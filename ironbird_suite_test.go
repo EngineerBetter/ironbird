@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -68,6 +69,9 @@ func loadSpec(filename string) {
 	setupErr = yaml.Unmarshal(yamlFile, &spec)
 	expectErrToNotHaveOccurred(setupErr)
 
+	absSpecDir, err := filepath.Abs(filepath.Dir(filename))
+	expectErrToNotHaveOccurred(err)
+	spec.SpecDir = absSpecDir
 	specs = append(specs, spec)
 }
 
@@ -83,7 +87,8 @@ var _ = BeforeSuite(func() {
 			}
 			for _, input := range specCase.It.HasInputs {
 				if input.From != "" {
-					Expect(input.From).To(BeADirectory())
+					inputPath := filepath.Join(spec.SpecDir, input.From)
+					Expect(inputPath).To(BeADirectory())
 				}
 			}
 		}
