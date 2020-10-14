@@ -1,5 +1,9 @@
 # ironbird
 
+![An Iron Bird](https://www.aerospacetestinginternational.com/wp-content/uploads/2019/04/Gulfstream_Iron-Bird_2-702x336.jpg)
+
+> An [iron bird](https://en.wikipedia.org/wiki/Iron_bird_(aviation)) is a ground-based test device used for prototyping and integrating aircraft systems during the development of new aircraft designs.
+
 Integration-tests Concourse tasks using `fly execute`, using a YAML test definition format.
 
 ## Usage
