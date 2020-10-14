@@ -1,10 +1,8 @@
-package wibble_test
+package ironbird_test
 
 import (
 	"flag"
 	"fmt"
-	"github.com/EngineerBetter/wibble"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"os"
@@ -12,22 +10,27 @@ import (
 	"testing"
 	"time"
 
+	"github.com/EngineerBetter/ironbird"
+	"gopkg.in/yaml.v2"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 const defaultTimeout = "20s"
-var specs []*wibble.TaskTestSuite
+
+var specs []*ironbird.TaskTestSuite
 
 var specsArg, targetArg string
 var timeoutFactorArg int
+
 func init() {
 	flag.StringVar(&specsArg, "specs", "", "Comma-separated list of spec files to execute")
 	flag.StringVar(&targetArg, "target", "", "fly target")
 	flag.IntVar(&timeoutFactorArg, "timeout-factor", 1, "multiplier for timeouts")
 }
 
-func TestWibble(t *testing.T) {
+func TestIronbird(t *testing.T) {
 	RegisterFailHandler(Fail)
 	specFiles := strings.Split(specsArg, ",")
 
@@ -61,7 +64,7 @@ func loadSpec(filename string) {
 	yamlFile, setupErr := ioutil.ReadFile(filename)
 	expectErrToNotHaveOccurred(setupErr)
 
-	var spec *wibble.TaskTestSuite
+	var spec *ironbird.TaskTestSuite
 	setupErr = yaml.Unmarshal(yamlFile, &spec)
 	expectErrToNotHaveOccurred(setupErr)
 

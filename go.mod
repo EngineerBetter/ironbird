@@ -1,4 +1,4 @@
-module github.com/EngineerBetter/wibble
+module github.com/EngineerBetter/ironbird
 
 go 1.15
 

@@ -1,4 +1,4 @@
-package wibble
+package ironbird
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-# Concourse Task Tester
+# ironbird
 
 Integration-tests Concourse tasks using `fly execute`, using a YAML test definition format.
 
@@ -14,7 +14,7 @@ Or alternatively
 
 ```terminal
 $ ginkgo build .
-$ ./wibble-test --specs some_spec.yml  --target eb
+$ ./ironbird-test --specs some_spec.yml  --target eb
 ```
 
 ## Spec Format
