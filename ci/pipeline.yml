@@ -2,9 +2,9 @@
 resources:
 - name: ironbird
   type: git
+  webhook_token: ((webhook_token))
   source:
     ignore_paths: [version]
-    webhook_token: ((webhook_token))
     <<: &git_source
       uri: https://github.com/EngineerBetter/ironbird.git
       branch: main
