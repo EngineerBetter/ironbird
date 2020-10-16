@@ -50,7 +50,7 @@ func TestIronbird(t *testing.T) {
 	for _, specFile := range specFiles {
 		loadSpec(specFile)
 	}
-	RunSpecs(t, "Concourse Tasks")
+	RunSpecs(t, "Ironbird: "+specsArg)
 }
 
 func loadSpec(filename string) {
