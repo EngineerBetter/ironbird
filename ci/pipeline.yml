@@ -41,12 +41,13 @@ jobs:
     trigger: true
   - task: test
     config:
-      platform: linux
-      image_resource:
-        type: registry-image
-        source: { repository: engineerbetter/pcf-ops }
-      inputs:
-      - name: ironbird
+      <<: &task-config
+        platform: linux
+        image_resource:
+          type: registry-image
+          source: { repository: engineerbetter/pcf-ops }
+        inputs:
+        - name: ironbird
       run:
         path: bash
         args:
@@ -69,12 +70,7 @@ jobs:
     trigger: true
   - task: build
     config:
-      platform: linux
-      image_resource:
-        type: registry-image
-        source: { repository: pcfops-docker }
-      inputs:
-      - name: ironbird
+      <<: *task-config
       outputs:
       - name: built
       run:
@@ -88,7 +84,7 @@ jobs:
           cd ironbird
           ginkgo build .
           mv ironbird.test ../built/ironbird
-          echo ironbird > ../built/ironbird
+          echo ironbird > ../built/name
   - put: version
     params:
       bump: patch
