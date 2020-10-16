@@ -1,0 +1,9 @@
+---
+config: sleep.yml
+cases:
+- when: it is called
+  within: 20s
+  it:
+    exits: 0
+  params:
+    DURATION: 21

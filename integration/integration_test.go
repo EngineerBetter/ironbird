@@ -45,7 +45,29 @@ var _ = Describe("Integration", func() {
 			cmd.Dir = tmpDir
 			session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 			Expect(err).ToNot(HaveOccurred())
-			Eventually(session, 1*time.Minute).Should(Exit(0))
+			Eventually(session, 2*time.Minute).Should(Exit(0))
+		})
+	})
+
+	Describe("timing out", func() {
+		When("a task times out", func() {
+			It("fails", func() {
+				cmd := exec.Command(executablePath, "--specs", "fixtures/failing_sleep_spec.yml", "--target", "eb")
+				cmd.Dir = tmpDir
+				session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+				Expect(err).ToNot(HaveOccurred())
+				Eventually(session, 1*time.Minute).Should(Exit(1))
+			})
+
+			Context("but timeout-factor allows more time", func() {
+				It("passes", func() {
+					cmd := exec.Command(executablePath, "--specs", "fixtures/failing_sleep_spec.yml", "--target", "eb", "--timeout-factor", "2")
+					cmd.Dir = tmpDir
+					session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+					Expect(err).ToNot(HaveOccurred())
+					Eventually(session, 1*time.Minute).Should(Exit(0))
+				})
+			})
 		})
 	})
 })
