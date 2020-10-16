@@ -54,9 +54,9 @@ cases:
     # Additional inputs needed for this test (optional)
     has_inputs:
       - name: input
-        # Optionally specify a base directory
+        # Dir, relative to this spec file, to use as the basis for the input (optional)
         from: fixtures/existing_file
-        # Optionally run a script in that dir to set it up
+        # Bash commands to apply to either blank dir, or dir above, before running fly execute (optional)
         setup: |
           echo foo > modified
   # Param values provided to the task (optional)
