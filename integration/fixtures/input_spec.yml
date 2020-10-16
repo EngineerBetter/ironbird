@@ -9,7 +9,7 @@ cases:
     - name: output
       for_which:
         - { bash: "stat existing", exits: 0}
-        - { bash: "stat modified", exits: 1, says: ["modified: stat: No such file or directory"]}
+        - { bash: "stat modified", exits: 1, says: ["stat:.* No such file or directory"]}
     has_inputs:
     - name: input
       from: inputs/existing_file
