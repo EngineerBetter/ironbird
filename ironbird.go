@@ -13,9 +13,13 @@ import (
 )
 
 type TaskTestSuite struct {
-	SpecDir string
-	Config  string `yaml:"config"`
-	Cases   []struct {
+	SpecDir   string
+	Config    string `yaml:"config"`
+	MainInput struct {
+		Name         string `yaml:"name"`
+		RelativeRoot string `yaml:"path_relative_to_spec"`
+	} `yaml:"enclosed_in_input"`
+	Cases []struct {
 		When   string `yaml:"when"`
 		Within string `yaml:"within"`
 		It     struct {
@@ -42,7 +46,7 @@ type TaskTestSuite struct {
 func FlyExecute(target, specDir, configPath string, params map[string]string, inputDirs, outputDirs map[string]string, timeout time.Duration) *gexec.Session {
 	gomega.Expect(specDir).To(gomega.BeADirectory())
 
-	flyArgs := []string{"-t", target, "execute", "-c", configPath, "--include-ignored", "--input=this=" + specDir}
+	flyArgs := []string{"-t", target, "execute", "-c", configPath, "--include-ignored"}
 
 	for name, dir := range inputDirs {
 		flyArgs = append(flyArgs, "--input="+name+"="+dir)

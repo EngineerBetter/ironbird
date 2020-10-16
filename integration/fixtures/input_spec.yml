@@ -1,5 +1,6 @@
 ---
 config: existing_file_write.yml
+enclosed_in_input: { name: this }
 cases:
 - when: no modifier is specified
   within: 30s

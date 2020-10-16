@@ -1,0 +1,11 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source: { repository: bash }
+
+inputs:
+  - name: pretend-repo
+
+run:
+  path: pretend-repo/ci/tasks/nested-task/task.sh

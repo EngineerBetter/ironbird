@@ -9,17 +9,11 @@ Integration-tests Concourse tasks using `fly execute`, using a YAML test definit
 ## Usage
 
 ```terminal
-$ ginkgo -- --specs some_spec.yml --target eb [--timeout-factor <int>]
+$ ginkgo build .
+$ ./ironbird-test --specs some_spec.yml,some_other_spec.yml --target eb [--timeout-factor <int>]
 ```
 
 Where `timeout-factor` multiplies the default or provided timeouts for execution. Useful if your Concourse is slower than the person who wrote the spec.
-
-Or alternatively
-
-```terminal
-$ ginkgo build .
-$ ./ironbird-test --specs some_spec.yml  --target eb
-```
 
 ## Spec Format
 
@@ -29,6 +23,12 @@ See example `*_spec.yml` files because I'm still figuring it out. In the mean ti
 ---
 # Task config file
 config: existing_file_write.yml
+# details of input that task config is normally within
+enclosed_in_input:
+  # the name of the input containing the task.yml
+  name: some-repo
+  # where the 'root' of the input containing task YAML/script is, relative to this spec file
+  path_relative_to_spec: ../../../
 cases:
 # Each 'when' maps to a `fly execute` invocation
 - when: modifier is specified
@@ -46,7 +46,7 @@ cases:
           # The following bash will be executed and asserted against
           - { bash: "stat existing", exits: 0, says: "4096 0 0 existing" }
           - { bash: "stat modified", exits: 0 }
-    # Inputs needed for this test
+    # Additional inputs needed for this test
     has_inputs:
       - name: input
         # Optionally specify a base directory

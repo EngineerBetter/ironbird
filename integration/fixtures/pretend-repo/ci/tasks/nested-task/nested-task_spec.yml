@@ -1,0 +1,8 @@
+---
+config: task.yml
+enclosed_in_input: { name: pretend-repo, path_relative_to_spec: ../../../ }
+cases:
+- when: it is called
+  it:
+    exits: 0
+    says: ["task invoked"]

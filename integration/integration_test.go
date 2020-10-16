@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Integration", func() {
+var _ = Describe("running ironbird", func() {
 	var tmpDir, executablePath string
 
 	BeforeSuite(func() {
@@ -41,7 +41,7 @@ var _ = Describe("Integration", func() {
 
 	Describe("running all the specs", func() {
 		It("works", func() {
-			cmd := exec.Command(executablePath, "--specs", "fixtures/file_write_spec.yml,fixtures/echo_spec.yml,fixtures/input_spec.yml", "--target", "eb", "--timeout-factor", "100")
+			cmd := exec.Command(executablePath, "--specs", "fixtures/file_write_spec.yml,fixtures/input_spec.yml", "--target", "eb", "--timeout-factor", "100")
 			cmd.Dir = tmpDir
 			session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 			Expect(err).ToNot(HaveOccurred())
@@ -68,6 +68,26 @@ var _ = Describe("Integration", func() {
 					Eventually(session, 1*time.Minute).Should(Exit(0))
 				})
 			})
+		})
+	})
+
+	Describe("testing task output", func() {
+		It("works", func() {
+			cmd := exec.Command(executablePath, "--specs", "fixtures/echo_spec.yml", "--target", "eb")
+			cmd.Dir = tmpDir
+			session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+			Expect(err).ToNot(HaveOccurred())
+			Eventually(session, 1*time.Minute).Should(Exit(0))
+		})
+	})
+
+	Describe("testing a task in a repo subdirectory", func() {
+		It("works", func() {
+			cmd := exec.Command(executablePath, "--specs", "fixtures/pretend-repo/ci/tasks/nested-task/nested-task_spec.yml", "--target", "eb")
+			cmd.Dir = tmpDir
+			session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+			Expect(err).ToNot(HaveOccurred())
+			Eventually(session, 1*time.Minute).Should(Exit(0))
 		})
 	})
 })

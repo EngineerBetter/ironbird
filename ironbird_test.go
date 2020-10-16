@@ -27,19 +27,24 @@ var _ = Describe("", func() {
 
 				Describe("when "+specCase.When, func() {
 					inputDirs := make(map[string]string)
-					for _, input := range specCase.It.HasInputs {
-						inputPath, err := ioutil.TempDir("", input.Name)
-						expectErrToNotHaveOccurred(err)
 
-						if input.From != "" {
-							MustBash("cp -r "+input.From+"/. "+inputPath, spec.SpecDir)
+					if spec.MainInput.Name != "" {
+						sourceDir := spec.SpecDir
+						if spec.MainInput.RelativeRoot != "" {
+							sourceDir = spec.MainInput.RelativeRoot
 						}
+
+						tmpInputPath := createTmpInputDir(spec.MainInput.Name, sourceDir, spec.SpecDir)
+						inputDirs[spec.MainInput.Name] = tmpInputPath
+					}
+
+					for _, input := range specCase.It.HasInputs {
+						tmpInputPath := createTmpInputDir(input.Name, input.From, spec.SpecDir)
+						inputDirs[input.Name] = tmpInputPath
 
 						if input.Setup != "" {
-							MustBash(input.Setup, inputPath)
+							MustBash(input.Setup, tmpInputPath)
 						}
-
-						inputDirs[input.Name] = inputPath
 					}
 
 					outputDirs := make(map[string]string)
@@ -102,6 +107,20 @@ var _ = Describe("", func() {
 		})
 	}
 })
+
+func createTmpInputDir(name, copyFrom, specDir string) string {
+	tmpInputPath, err := ioutil.TempDir("", name)
+	expectErrToNotHaveOccurred(err)
+
+	// Allow all users access, otherwise Concourse can't read dir when executing
+	MustBash("chmod 0777 "+tmpInputPath, "")
+
+	if copyFrom != "" {
+		MustBash("cp -r "+copyFrom+"/. "+tmpInputPath, specDir)
+	}
+
+	return tmpInputPath
+}
 
 func expectErrToNotHaveOccurred(err error) {
 	if err != nil {
