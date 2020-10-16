@@ -6,9 +6,10 @@ resources:
   source:
     ignore_paths: [version]
     <<: &git_source
-      uri: https://github.com/EngineerBetter/ironbird.git
+      uri: git@github.com:EngineerBetter/ironbird.git
+      private_key: |
+        ((github_private_key))
       branch: main
-
 - name: version
   type: semver
   source:
@@ -82,8 +83,12 @@ jobs:
           go get github.com/onsi/gomega
 
           cd ironbird
-          ginkgo build .
-          mv ironbird.test ../built/ironbird
+          GOOS=linux ginkgo build .
+          mv ironbird.test ../built/ironbird-linux
+
+          GOOS=darwin ginkgo build .
+          mv ironbird.test ../built/ironbird-darwin
+
           echo ironbird > ../built/name
   - put: version
     params:
@@ -92,4 +97,4 @@ jobs:
     params:
       name: built/name
       tag: version/version
-      globs: [built/ironbird]
+      globs: [built/ironbird*]
