@@ -1,0 +1,8 @@
+---
+config: echo.yml
+enclosed_in_input: { name: this }
+cases:
+- when: params say it should fail
+  it: { exits: 1 }
+  params:
+    EXIT_CODE: 1

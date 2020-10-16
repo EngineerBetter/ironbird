@@ -49,6 +49,30 @@ var _ = Describe("running ironbird", func() {
 		})
 	})
 
+	Describe("testing task exit codes", func() {
+		When("the spec expects failure", func() {
+			Context("and the task exits 1", func() {
+				It("passes", func() {
+					cmd := exec.Command(executablePath, "--specs", "fixtures/passing_exit1_spec.yml", "--target", "eb")
+					cmd.Dir = tmpDir
+					session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+					Expect(err).ToNot(HaveOccurred())
+					Eventually(session, 2*time.Minute).Should(Exit(0))
+				})
+			})
+
+			Context("and the task exits 0", func() {
+				It("fails", func() {
+					cmd := exec.Command(executablePath, "--specs", "fixtures/failing_exit1_spec.yml", "--target", "eb")
+					cmd.Dir = tmpDir
+					session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+					Expect(err).ToNot(HaveOccurred())
+					Eventually(session, 2*time.Minute).Should(Exit(1))
+				})
+			})
+		})
+	})
+
 	Describe("timing out", func() {
 		When("a task times out", func() {
 			It("fails", func() {
