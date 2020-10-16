@@ -4,7 +4,7 @@ resources:
   type: git
   webhook_token: ((webhook_token))
   source:
-    ignore_paths: [version]
+    ignore_paths: [version, README.md]
     <<: &git_source
       uri: git@github.com:EngineerBetter/ironbird.git
       private_key: |
