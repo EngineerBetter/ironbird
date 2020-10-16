@@ -65,3 +65,6 @@ cases:
     FILENAME: myfile
 ```
 
+## Wouldn't it be quicker if the tests ran in Docker?
+
+Yes.
