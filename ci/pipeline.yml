@@ -1,0 +1,98 @@
+---
+resources:
+- name: ironbird
+  type: git
+  source:
+    ignore_paths: [version]
+    webhook_token: ((webhook_token))
+    <<: &git_source
+      uri: https://github.com/EngineerBetter/ironbird.git
+      branch: main
+
+- name: version
+  type: semver
+  source:
+    driver: git
+    branch: main
+    file: version
+    depth: 1
+    <<: *git_source
+- name: release
+  type: github-release
+  source:
+    owner: EngineerBetter
+    repository: ironbird
+    access_token: ((github_access_token))
+
+jobs:
+- name: set-pipeline
+  serial: true
+  plan:
+  - get: ironbird
+    trigger: true
+  - set_pipeline: self
+    file: ironbird/ci/pipeline.yml
+
+- name: test
+  serial: true
+  plan:
+  - get: ironbird
+    passed: [set-pipeline]
+    trigger: true
+  - task: test
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: pcfops-docker }
+      inputs:
+      - name: ironbird
+      run:
+        path: bash
+        args:
+        - -xeuc
+        - |
+          go get github.com/onsi/ginkgo/ginkgo
+          go get github.com/onsi/gomega
+
+          fly login -t eb -c https://ci.engineerbetter.com -u admin -p ((concourse_password))
+
+          cd ironbird/integration
+          ginkgo -p
+
+- name: release
+  serial: true
+  plan:
+  - get: ironbird
+    passed: [test]
+    trigger: true
+  - task: build
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: pcfops-docker }
+      inputs:
+      - name: ironbird
+      outputs:
+      - name: built
+      run:
+        path: bash
+        args:
+        - -xeuc
+        - |
+          go get github.com/onsi/ginkgo/ginkgo
+          go get github.com/onsi/gomega
+
+          cd ironbird
+          ginkgo build .
+          mv ironbird.test ../built/ironbird
+          echo ironbird > ../built/ironbird
+  - put: version
+    params:
+      bump: patch
+  - put: release
+    params:
+      name: built/name
+      tag: version/version
+      globs: [built/ironbird]
