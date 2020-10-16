@@ -93,6 +93,11 @@ var _ = Describe("running ironbird", func() {
 			session := invoke("--specs", "fixtures/echo_spec.yml")
 			Eventually(session, 1*time.Minute).Should(Exit(0))
 		})
+
+		It("matches against STDOUT and STDERR", func() {
+			session := invoke("--specs", "fixtures/echo_redirect_spec.yml")
+			Eventually(session, 1*time.Minute).Should(Exit(0))
+		})
 	})
 
 	Describe("testing a task in a repo subdirectory", func() {

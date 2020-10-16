@@ -1,0 +1,9 @@
+---
+config: echo_redirect.yml
+enclosed_in_input: { name: this }
+cases:
+- when: it says things on both streams
+  it: { exits: 0, says: ["expected output", "an error"] }
+  params:
+    MESSAGE_STDOUT: expected output
+    MESSAGE_STDERR: an error
