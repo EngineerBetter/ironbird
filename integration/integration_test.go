@@ -26,18 +26,17 @@ var _ = Describe("running ironbird", func() {
 	}
 
 	BeforeSuite(func() {
-		ginkgoArgs := []string{"build", "../"}
-		cmd := exec.Command("ginkgo", ginkgoArgs...)
+		tmpDir, err := ioutil.TempDir("", "ironbird-build")
+		MustBash("cp -r . "+tmpDir, "../")
+
+		cmd := exec.Command("ginkgo", "build", ".")
+		cmd.Dir = tmpDir
 		session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 		Eventually(session, 20*time.Second).Should(Exit(0))
-		Expect("../ironbird.test").To(BeAnExistingFile())
-
-		tmpDir, err = ioutil.TempDir("", "ironbird")
-		Expect(err).ToNot(HaveOccurred())
-		executablePath = filepath.Join(tmpDir, "ironbird")
-		err = os.Rename("../ironbird.test", executablePath)
-		Expect(err).ToNot(HaveOccurred())
+		executablePath = filepath.Join(tmpDir, "ironbird.test")
+		MustBash("mv *.test ironbird.test", tmpDir)
+		Expect(filepath.Join(tmpDir, "ironbird.test")).To(BeAnExistingFile())
 
 		MustBash("cp -r integration/fixtures "+tmpDir, "../")
 		MustBash("chmod 0777 "+tmpDir, "")
