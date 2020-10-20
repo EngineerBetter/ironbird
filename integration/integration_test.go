@@ -73,7 +73,7 @@ var _ = Describe("running ironbird", func() {
 				It("logs the fly intercept command to debug with", func() {
 					session := invoke("--specs", "fixtures/failing_exit1_spec.yml")
 					Eventually(session, 2*time.Minute).Should(Exit(1))
-					Expect(session).To(Say(`fly -t eb intercept -b \d*`))
+					Expect(session).To(Say(`fly -t ` + targetArg + ` intercept -b \d*`))
 				})
 			})
 		})
