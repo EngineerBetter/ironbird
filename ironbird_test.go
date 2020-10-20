@@ -69,8 +69,8 @@ var _ = Describe("", func() {
 						interceptMessage := ""
 						if specCase.It.Exits != 0 && session.Out != nil {
 							pattern := regexp.MustCompile(`executing build (\d*) at http`)
-							buildNumber := pattern.Find(session.Out.Contents())
-							interceptMessage = fmt.Sprintf("\nTask failed unexpectedly, debug with:\nfly -t %s intercept -b %s", targetArg, string(buildNumber))
+							buildNumber := pattern.FindStringSubmatch(string(session.Out.Contents()))
+							interceptMessage = fmt.Sprintf("\nTask failed unexpectedly, debug with:\nfly -t %s intercept -b %s\n---", targetArg, string(buildNumber[1]))
 						}
 
 						Expect(session).To(Exit(specCase.It.Exits), OutErrMessage(session)+interceptMessage)
