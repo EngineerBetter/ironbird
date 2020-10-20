@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"time"
 
 	. "github.com/EngineerBetter/ironbird"
@@ -64,7 +65,15 @@ var _ = Describe("", func() {
 						Expect(err).ToNot(HaveOccurred())
 						timeout = timeout * time.Duration(timeoutFactorArg)
 						session = FlyExecute(targetArg, spec.SpecDir, spec.Config, specCase.Params, inputDirs, outputDirs, timeout)
-						Expect(session).To(Exit(specCase.It.Exits), OutErrMessage(session))
+
+						interceptMessage := ""
+						if specCase.It.Exits != 0 && session.Out != nil {
+							pattern := regexp.MustCompile(`executing build (\d*) at http`)
+							buildNumber := pattern.Find(session.Out.Contents())
+							interceptMessage = fmt.Sprintf("\nTask failed unexpectedly, debug with:\nfly -t %s intercept -b %d", targetArg, buildNumber)
+						}
+
+						Expect(session).To(Exit(specCase.It.Exits), OutErrMessage(session)+interceptMessage)
 						Expect(session).To(Say("executing build"))
 						Expect(session).To(Say("initializing"))
 					})

@@ -10,6 +10,7 @@ import (
 	. "github.com/EngineerBetter/ironbird"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 )
 
@@ -67,6 +68,12 @@ var _ = Describe("running ironbird", func() {
 				It("fails", func() {
 					session := invoke("--specs", "fixtures/failing_exit1_spec.yml")
 					Eventually(session, 2*time.Minute).Should(Exit(1))
+				})
+
+				It("logs the fly intercept command to debug with", func() {
+					session := invoke("--specs", "fixtures/failing_exit1_spec.yml")
+					Eventually(session, 2*time.Minute).Should(Exit(1))
+					Expect(session).To(Say(`fly -t eb intercept -b \d*`))
 				})
 			})
 		})
