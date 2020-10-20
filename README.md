@@ -65,6 +65,10 @@ cases:
     FILENAME: myfile
 ```
 
+## :warning::fire: Setup/Bash steps are not containerised
+
+The `setup` and `bash` scripts for inputs and outputs respectively **_do not run in a container_** and execute on the machine that `ironbird` was executed on, rather than in the `fly execute`d container. Do not execute anything destructive, or that changes global config.
+
 ## Wouldn't it be quicker if the tests ran in Docker?
 
 [Yes.](https://github.com/EngineerBetter/ironbird/issues/3)
