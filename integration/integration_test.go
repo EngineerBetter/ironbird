@@ -18,7 +18,7 @@ var _ = Describe("running ironbird", func() {
 	var tmpDir, executablePath string
 
 	invoke := func(args ...string) *Session {
-		args = append(args, "--target", "eb")
+		args = append(args, "--target", targetArg)
 		cmd := exec.Command(executablePath, args...)
 		cmd.Dir = tmpDir
 		session, err := Start(cmd, GinkgoWriter, GinkgoWriter)

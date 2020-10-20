@@ -57,11 +57,11 @@ jobs:
           go get github.com/onsi/ginkgo/ginkgo
           go get github.com/onsi/gomega
 
-          fly login -t eb -c https://ci.engineerbetter.com -u admin -p ((concourse_password))
-          fly -t eb sync
+          fly login -t this -c ((concourse_url)) -u ((concourse_username)) -p ((concourse_password))
+          fly -t this sync
 
           cd ironbird/integration
-          ginkgo -p
+          ginkgo -p -- --target this
 
 - name: release
   serial: true
