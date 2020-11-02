@@ -1,0 +1,9 @@
+---
+config: sleep.yml
+enclosed_in_input: { name: this }
+cases:
+- when: it is called
+  it:
+    exits: 0
+  params:
+    DURATION: 6

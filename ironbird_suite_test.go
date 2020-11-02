@@ -15,10 +15,11 @@ import (
 	"gopkg.in/yaml.v2"
 
 	. "github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"
 )
 
-const defaultTimeout = "20s"
+const defaultTimeout = time.Second * time.Duration(20)
 
 var specs []*ironbird.TaskTestSuite
 
@@ -32,9 +33,6 @@ func init() {
 }
 
 func TestIronbird(t *testing.T) {
-	RegisterFailHandler(Fail)
-	specFiles := strings.Split(specsArg, ",")
-
 	if specsArg == "" {
 		log.Fatal("--specs must be provided")
 	}
@@ -47,9 +45,16 @@ func TestIronbird(t *testing.T) {
 		log.Fatal("--timeout-factor must be >= 1")
 	}
 
+	modifier := .9
+	slowSpecThreshold := time.Duration(defaultTimeout.Seconds()*float64(timeoutFactorArg)*modifier) * time.Second
+	config.DefaultReporterConfig.SlowSpecThreshold = slowSpecThreshold.Seconds()
+
+	specFiles := strings.Split(specsArg, ",")
 	for _, specFile := range specFiles {
 		loadSpec(specFile)
 	}
+
+	RegisterFailHandler(Fail)
 	RunSpecs(t, "Ironbird: "+specsArg)
 }
 

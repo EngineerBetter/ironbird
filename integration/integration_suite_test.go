@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	. "github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"
 )
 
@@ -16,6 +17,7 @@ func init() {
 }
 
 func TestIntegration(t *testing.T) {
+	config.DefaultReporterConfig.SlowSpecThreshold = 60.0
 	if targetArg == "" {
 		log.Fatal("--target argument must be provided")
 	}

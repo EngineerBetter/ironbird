@@ -101,6 +101,16 @@ var _ = Describe("running ironbird", func() {
 		})
 	})
 
+	Describe("slow specs", func() {
+		When("a test takes 6 seconds", func() {
+			It("does not print Ginkgo's warning about slow specs", func() {
+				session := invoke("--specs", "fixtures/short_sleep_spec.yml")
+				Eventually(session, 1*time.Minute).Should(Exit(0))
+				Expect(session).ToNot(Say("SLOW TEST"))
+			})
+		})
+	})
+
 	Describe("testing task output", func() {
 		It("works", func() {
 			session := invoke("--specs", "fixtures/echo_spec.yml")

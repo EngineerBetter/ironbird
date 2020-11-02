@@ -62,12 +62,11 @@ var _ = Describe("", func() {
 
 					var session *Session
 					It(fmt.Sprintf("exits %d", specCase.It.Exits), func() {
-						within := specCase.Within
-						if within == "" {
-							within = defaultTimeout
+						var timeout = defaultTimeout
+						if specCase.Within != "" {
+							timeout, err = time.ParseDuration(specCase.Within)
+							Expect(err).ToNot(HaveOccurred())
 						}
-						timeout, err := time.ParseDuration(within)
-						Expect(err).ToNot(HaveOccurred())
 						timeout = timeout * time.Duration(timeoutFactorArg)
 						session = FlyExecute(targetArg, spec.SpecDir, spec.Config, specCase.Params, inputDirs, outputDirs, timeout)
 
