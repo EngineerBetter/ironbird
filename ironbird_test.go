@@ -22,10 +22,12 @@ var _ = Describe("", func() {
 		// Re-assign as otherwise the single pointer is shared by the anonymous functions, and by the time that they
 		// execute, range will have made the single pointer point to something else. Possibly.
 		spec := specX
+		cwd, err := os.Getwd()
+		expectErrToNotHaveOccurred(err)
+		relativeTaskConfigPath, err := filepath.Rel(cwd, filepath.Join(spec.SpecDir, spec.Config))
+		expectErrToNotHaveOccurred(err)
 
-		taskConfigPath := filepath.Join(spec.SpecDir, spec.Config)
-
-		Describe(taskConfigPath, func() {
+		Describe(relativeTaskConfigPath, func() {
 			for _, specCaseX := range spec.Cases {
 				specCase := specCaseX
 
