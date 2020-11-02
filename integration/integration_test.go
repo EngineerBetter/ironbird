@@ -70,6 +70,12 @@ var _ = Describe("running ironbird", func() {
 					Eventually(session, 2*time.Minute).Should(Exit(1))
 				})
 
+				It("gives the relative task config path", func() {
+					session := invoke("--specs", "fixtures/failing_exit1_spec.yml")
+					Eventually(session, 2*time.Minute).Should(Exit(1))
+					Expect(session).To(Say("fixtures/echo.yml"))
+				})
+
 				It("logs the fly intercept command to debug with", func() {
 					session := invoke("--specs", "fixtures/failing_exit1_spec.yml")
 					Eventually(session, 2*time.Minute).Should(Exit(1))

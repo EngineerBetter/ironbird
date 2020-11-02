@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"time"
 
@@ -22,7 +23,9 @@ var _ = Describe("", func() {
 		// execute, range will have made the single pointer point to something else. Possibly.
 		spec := specX
 
-		Describe(spec.Config, func() {
+		taskConfigPath := filepath.Join(spec.SpecDir, spec.Config)
+
+		Describe(taskConfigPath, func() {
 			for _, specCaseX := range spec.Cases {
 				specCase := specCaseX
 
