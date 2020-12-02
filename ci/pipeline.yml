@@ -131,6 +131,7 @@ jobs:
     - get: concourse-tasks
     - get: pcf-ops
   - task: update-homebrew-formula
+    image: pcf-ops
     file: ironbird/ci/update-homebrew-formula.yml
   - task: commit
     file: concourse-tasks/git-commit-if-changed/task.yml

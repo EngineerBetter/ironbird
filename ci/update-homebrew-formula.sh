@@ -9,7 +9,7 @@ linux_cli_sha256=$(openssl dgst -sha256 release/ironbird-linux | cut -d ' ' -f 2
 
 pushd homebrew-tap
   cat <<EOF > ironbird.rb
-class ControlTower < Formula
+class Ironbird < Formula
   desc "Test Concourse tasks using a YAML DSL for Ginkgo/Gomega"
   homepage "https://www.engineerbetter.com"
   license "Apache-2.0"
