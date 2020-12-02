@@ -6,6 +6,12 @@
 
 Integration-tests Concourse tasks using `fly execute`, using a YAML test definition format.
 
+## Installation
+
+```terminal
+brew install engineerbetter/tap/ironbird
+```
+
 ## Usage
 
 ```terminal
