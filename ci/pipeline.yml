@@ -24,6 +24,25 @@ resources:
     owner: EngineerBetter
     repository: ironbird
     access_token: ((github_access_token))
+- name: concourse-tasks
+  type: git
+  source:
+    uri: https://github.com/EngineerBetter/concourse-tasks.git
+    branch: 0.0.27
+- name: pcf-ops
+  type: docker-image
+  icon: docker
+  source:
+    repository: engineerbetter/pcf-ops
+    username: ((dockerhub_user))
+    password: ((dockerhub_password))
+- name: homebrew-tap
+  type: git
+  icon: github
+  source:
+    uri: git@github.com:EngineerBetter/homebrew-tap.git
+    branch: master
+    private_key: ((github_private_key_homebrew))
 
 jobs:
 - name: set-pipeline
@@ -98,3 +117,29 @@ jobs:
       name: built/name
       tag: version/version
       globs: [built/ironbird*]
+
+- name: update-homebrew-formula
+  serial: true
+  plan:
+  - in_parallel:
+    - get: release
+      passed: [release]
+      trigger: true
+    - get: homebrew-tap
+    - get: ironbird
+      passed: [release]
+    - get: pcf-ops
+  - task: update-homebrew-formula
+    file: ironbird/ci/update-homebrew-formula.yml
+  - task: commit
+    file: concourse-tasks/git-commit-if-changed/task.yml
+    input_mapping: { input: homebrew-tap }
+    output_mapping: { output: homebrew-tap }
+    params:
+      FILES: ironbird.rb
+      GIT_AUTHOR_EMAIL: systems@engineerbetter.com
+      GIT_AUTHOR_NAME: "CI"
+      GIT_COMMIT_MESSAGE: Update Ironbird version
+  - put: homebrew-tap
+    params:
+      repository: homebrew-tap

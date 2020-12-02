@@ -1,0 +1,13 @@
+---
+platform: linux
+
+inputs:
+- name: homebrew-tap
+- name: release
+- name: ironbird
+
+outputs:
+- name: homebrew-tap
+
+run:
+    path: ironbird/ci/update-homebrew-formula.sh
