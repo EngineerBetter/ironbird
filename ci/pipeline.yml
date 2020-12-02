@@ -125,9 +125,10 @@ jobs:
     - get: release
       passed: [release]
       trigger: true
-    - get: homebrew-tap
     - get: ironbird
       passed: [release]
+    - get: homebrew-tap
+    - get: concourse-tasks
     - get: pcf-ops
   - task: update-homebrew-formula
     file: ironbird/ci/update-homebrew-formula.yml
