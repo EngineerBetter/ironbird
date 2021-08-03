@@ -4,7 +4,7 @@
 
 > An [iron bird](https://en.wikipedia.org/wiki/Iron_bird_(aviation)) is a ground-based test device used for prototyping and integrating aircraft systems during the development of new aircraft designs.
 
-Integration-tests Concourse tasks using `fly execute`, using a YAML test definition format.
+Integration-tests [Concourse tasks](https://github.com/EngineerBetter/concourse-tasks) using `fly execute`, using a YAML test definition format.
 
 ## Installation
 
@@ -24,7 +24,7 @@ $ ironbird --specs some_spec.yml,some_other_spec.yml --target eb [--timeout-fact
 
 ## Why?
 
-Concourse tasks should be tested, and there was no simple, succinct way to test simple tasks. No-one wants to write a hundred lines of Golang to test four lines of Bash.
+[Concourse tasks](https://github.com/EngineerBetter/concourse-tasks) should be tested, and there was no simple, succinct way to test simple tasks. No-one wants to write a hundred lines of Golang to test four lines of Bash.
 
 ## Spec Format
 
