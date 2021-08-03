@@ -78,3 +78,25 @@ The `setup` and `bash` scripts for inputs and outputs respectively **_do not run
 ## Wouldn't it be quicker if the tests ran in Docker?
 
 [Yes.](https://github.com/EngineerBetter/ironbird/issues/3)
+
+## Contributing
+
+https://ci.engineerbetter.com/teams/main/pipelines/ironbird
+
+![Build status](https://ci.engineerbetter.com/api/v1/teams/main/pipelines/ironbird/jobs/test/badge)
+
+### Testing
+
+The canonical reference for how to run the integration tests is [the CI pipeline](ci/pipeline.yml#L76-L83), but a (possibly out-of-date) copy is presented here for convenience:
+
+```bash
+# Get dependencies
+go get github.com/onsi/ginkgo/ginkgo
+go get github.com/onsi/gomega
+# Login to a Concourse upon which to run the tests
+fly login -t this -c ${concourse_url} -u ${concourse_username} -p ${concourse_password}
+fly -t this sync
+# Run the tests
+cd integration
+ginkgo -p -- --target this
+```
